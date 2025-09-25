@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Para Jade — Flores Amarillas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --yellow:#FFD54A;
+      --deep-yellow:#FFC107;
+      --green:#2E7D32;
+      --accent:#FFF9E6;
+      --bg:#fffefc;
+      --muted:#6b6b6b;
+      --card-shadow: 0 8px 30px rgba(46,125,50,0.08);
+      --glass: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,var(--bg),#fff);color:#222}
+
+    /* Overlay inicial con sobre */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: #fffbea;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 10000;
+    }
+    .envelope {
+      width: 180px;
+      height: 120px;
+      background: var(--yellow);
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      border-radius: 4px;
+      transition: transform 0.3s;
+    }
+    .envelope:hover { transform: scale(1.05); }
+    .envelope::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      border-left: 90px solid transparent;
+      border-right: 90px solid transparent;
+      border-bottom: 60px solid var(--deep-yellow);
+    }
+    .open-text {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #444;
+      animation: blink 1.2s infinite;
+    }
+    @keyframes blink { 50% { opacity: 0.5; } }
+
+    /* Ocultar contenido hasta abrir */
+    #mainContent { display: none; }
+
+    /* Tu diseño original */
+    .hero{min-height:60vh;display:grid;grid-template-columns:1fr 420px;align-items:center;padding:48px 6vw;gap:32px}
+    .hero-left{max-width:700px}
+    h1{font-family:'Playfair Display',serif;font-size:48px;margin:0 0 12px;line-height:1.02;color:#2b2b2b}
+    .subtitle{font-size:18px;color:var(--muted);margin-bottom:18px}
+    .message-card{background:linear-gradient(180deg,var(--accent),#ffffff);padding:18px;border-radius:16px;box-shadow:var(--card-shadow);display:flex;gap:16px;align-items:center}
+    .flower-emoji{font-size:42px}
+    .cta-row{margin-top:20px;display:flex;gap:12px}
+    .btn{background:var(--yellow);border:none;padding:12px 16px;border-radius:12px;font-weight:600;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,0.08)}
+    .btn.secondary{background:transparent;border:2px solid var(--deep-yellow);}
+    .hero-right{display:flex;flex-direction:column;gap:16px;align-items:center}
+    .card-photo{width:320px;border-radius:18px;overflow:hidden;box-shadow:var(--card-shadow);position:relative}
+    .card-photo img{width:100%;height:auto;display:block}
+    .card-caption{text-align:center;font-weight:600;padding:8px 12px;border-radius:12px;background:linear-gradient(90deg,rgba(255,213,74,0.12),rgba(255,193,7,0.06));width:100%}
+    .gallery{padding:40px 6vw;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+    .tile{background:var(--glass);border-radius:14px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:var(--card-shadow)}
+    .tile img{width:100%;border-radius:10px;display:block}
+    .tile p{margin:0;color:var(--muted);font-size:14px}
+    footer{padding:24px 6vw;text-align:center;color:var(--muted);font-size:14px}
+    @media (max-width:880px){
+      .hero{grid-template-columns:1fr;padding:36px 5vw}
+      h1{font-size:36px}
+      .hero-right{order:-1}
+      .card-photo{width:100%}
+    }
+    .floral{position:fixed;z-index:0;opacity:0.12;pointer-events:none}
+    .floral.top-left{left:-40px;top:-20px;width:260px}
+    .floral.bottom-right{right:-60px;bottom:-40px;width:320px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.36);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:all .22s}
+    .modal.open{opacity:1;pointer-events:auto}
+    .modal-card{background:white;border-radius:14px;padding:20px;max-width:520px;width:100%;box-shadow:0 18px 40px rgba(0,0,0,0.18)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center}
+    .close{background:none;border:0;font-size:18px;cursor:pointer}
+  </style>
+</head>
+<body>
+
+  <!-- Overlay del sobre -->
+  <div id="overlay">
+    <div class="envelope" onclick="openEnvelope()"></div>
+    <div class="open-text">Abrir</div>
+  </div>
+
+  <!-- Contenido principal oculto hasta abrir -->
+  <div id="mainContent">
+
+    <!-- decorative SVG flowers -->
+    <img class="floral top-left" src="..." alt="flor"/>
+    <img class="floral bottom-right" src="..." alt="flor2"/>
+
+    <header class="hero">
+      <div class="hero-left">
+        <h1>Para <span style="color:var(--deep-yellow)">Jade</span>, con todo mi cariño</h1>
+        <p class="subtitle">Una página sencilla hecha para sorprenderte: flores amarillas, detalles cálidos y un pequeño mensaje pensado solo para ti.</p>
+        <div class="message-card">
+          <div class="flower-emoji">🌼</div>
+          <div>
+            <div style="font-weight:700">Hola Jade</div>
+            <div style="color:var(--muted);font-size:14px">Que cada día florezca como estas flores amarillas.</div>
+          </div>
+        </div>
+        <div class="cta-row">
+          <button class="btn" id="openMsg">Ver Sorpresa</button>
+          <button class="btn secondary" id="galleryBtn">Ver Galería</button>
+        </div>
+        <div style="margin-top:22px;color:var(--muted);font-size:14px;max-width:650px">
+          Jade, estas flores amarillas representan alegría y energía positiva. Me siento muy contento de tenerte en mi vida y compartir contigo tantos momentos especiales.
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="card-photo">
+          <img src="img/ramo4.jpeg" alt="ramo de flores amarillas"/>
+        </div>
+        <div class="card-caption">Un ramo de flores amarillas — pensado para <strong>Jade</strong></div>
+      </div>
+    </header>
+
+    <section class="gallery" id="gallery">
+      <div class="tile">
+        <img src="img/ramo2.jpg" alt="flor 1"/>
+        <p>Amarillas y luminosas</p>
+      </div>
+      <div class="tile">
+        <img src="img/ramo.jpg" alt="flor 2"/>
+        <p>Detalles que alegran</p>
+      </div>
+      <div class="tile">
+        <img src="img/osito.jpg" alt="flor 3"/>
+        <p>Un ramo para ti</p>
+      </div>
+      <div class="tile">
+        <img src="img/ramo3.jpeg" alt="flor 4"/>
+        <p>Siempre brillante</p>
+      </div>
+    </section>
+
+    <footer>
+      <div>Hecho con 🌼 y cariño — <strong>Para Jade</strong></div>
+      <div style="margin-top:8px;color:#9a9a9a;font-size:13px">Cada pétalo me recuerda lo afortunado que soy de tenerte.</div>
+    </footer>
+
+    <!-- modal -->
+    <div class="modal" id="modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <strong>Un pequeño mensaje para Jade</strong>
+          <button class="close" id="closeModal">✕</button>
+        </div>
+        <div style="margin-top:12px;color:var(--muted);line-height:1.5">
+          <p>Jade, cada día contigo es como un campo de flores amarillas: cálido, lleno de luz y precioso. Gracias por ser tú. 💛</p>
+          <p style="margin-top:10px">— Con mucho cariño para mi capibarita :3</p>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:18px">
+          <button class="btn" id="surpriseConfetti">Celebrar 🎉</button>
+        </div>
+      </div>
+    </div>
+
+    <canvas id="confettiCanvas" style="position:fixed;pointer-events:none;inset:0;z-index:9999"></canvas>
+  </div>
+
+  <script>
+    // Función para abrir sobre
+    function openEnvelope() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+      document.body.style.overflow = "auto";
+    }
+
+    // modal logic
+    const modal = document.getElementById('modal');
+    const openBtn = document.getElementById('openMsg');
+    const closeBtn = document.getElementById('closeModal');
+    const galleryBtn = document.getElementById('galleryBtn');
+    openBtn.addEventListener('click',()=>{modal.classList.add('open')});
+    closeBtn.addEventListener('click',()=>{modal.classList.remove('open')});
+    galleryBtn.addEventListener('click',()=>{window.scrollTo({top:document.getElementById('gallery').offsetTop-20,behavior:'smooth'})});
+
+    // confetti
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const ctx = confettiCanvas.getContext('2d');
+    function resize(){confettiCanvas.width=window.innerWidth;confettiCanvas.height=window.innerHeight}
+    window.addEventListener('resize',resize);resize();
+
+    function random(min,max){return Math.random()*(max-min)+min}
+    let confettis = [];
+    function spawnConfetti(){
+      for(let i=0;i<120;i++){
+        confettis.push({x:random(0,confettiCanvas.width),y:random(-200,0),r:random(6,12),d:random(1,4),tilt:random(-10,10),color:`hsl(${random(45,60)},90%,55%)`});
+      }
+      animateConfetti();
+    }
+    let animId=null;
+    function animateConfetti(){
+      if(animId) cancelAnimationFrame(animId);
+      function frame(){
+        ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+        confettis.forEach((c,i)=>{
+          c.y+=c.d+0.5;
+          c.x+=Math.sin(c.y/20)*1.5;
+          c.tilt+=0.1;
+          ctx.save();
+          ctx.translate(c.x,c.y);
+          ctx.rotate(c.tilt*0.02);
+          ctx.fillStyle=c.color;
+          ctx.fillRect(-c.r/2,-c.r/2,c.r, c.r*0.6);
+          ctx.restore();
+          if(c.y>confettiCanvas.height+30) confettis.splice(i,1);
+        });
+        if(confettis.length>0) animId=requestAnimationFrame(frame); else cancelAnimationFrame(animId);
+      }
+      frame();
+    }
+    document.getElementById('surpriseConfetti').addEventListener('click',()=>{spawnConfetti();});
+  </script>
+</body>
+</html>
